@@ -1,1 +1,1 @@
-irc
+tps_irc
