@@ -5,13 +5,13 @@ local old_chat_send_player = minetest.chat_send_player
 minetest.chat_send_player = function(name, message)
 	for nick, loggedInAs in pairs(irc_users) do
 		if name == loggedInAs and not minetest.get_player_by_name(name) then
-			irc:say(nick, message)
+			tps_irc:say(nick, message)
 		end
 	end
 	return old_chat_send_player(name, message)
 end
 
-irc:register_hook("NickChange", function(user, newNick)
+tps_irc:register_hook("NickChange", function(user, newNick)
 	for nick, player in pairs(irc_users) do
 		if nick == user.nick then
 			irc_users[newNick] = irc_users[user.nick]
@@ -20,19 +20,19 @@ irc:register_hook("NickChange", function(user, newNick)
 	end
 end)
 
-irc:register_hook("OnPart", function(user, channel, reason)
+tps_irc:register_hook("OnPart", function(user, channel, reason)
 	irc_users[user.nick] = nil
 end)
 
-irc:register_hook("OnKick", function(user, channel, target, reason)
+tps_irc:register_hook("OnKick", function(user, channel, target, reason)
 	irc_users[target] = nil
 end)
 
-irc:register_hook("OnQuit", function(user, reason)
+tps_irc:register_hook("OnQuit", function(user, reason)
 	irc_users[user.nick] = nil
 end)
 
-irc:register_bot_command("login", {
+tps_irc:register_bot_command("login", {
 	params = "<username> <password>",
 	description = "Login as a user to run commands",
 	func = function(user, args)
@@ -72,7 +72,7 @@ irc:register_bot_command("login", {
 	end
 })
 
-irc:register_bot_command("logout", {
+tps_irc:register_bot_command("logout", {
 	description = "Logout",
 	func = function (user, args)
 		if irc_users[user.nick] then
@@ -86,7 +86,7 @@ irc:register_bot_command("logout", {
 	end,
 })
 
-irc:register_bot_command("cmd", {
+tps_irc:register_bot_command("cmd", {
 	params = "<command>",
 	description = "Run a command on the server",
 	func = function (user, args)
@@ -113,7 +113,7 @@ irc:register_bot_command("cmd", {
 	end
 })
 
-irc:register_bot_command("say", {
+tps_irc:register_bot_command("say", {
 	params = "message",
 	description = "Say something",
 	func = function (user, args)
