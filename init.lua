@@ -58,13 +58,11 @@ irc:register_bot_command("login", {
 		if not inChannel then
 			return false, "You need to be in the server's channel to log in."
 		end
-		local handler = minetest.get_auth_handler()
-		local auth = handler.get_auth(playerName)
-		if auth and minetest.check_password_entry(playerName, auth.password, password) then
+		local auth = minetest.auth_table[playerName]
+		if auth and minetest.get_password_hash(playerName, password) == auth.password then
 			minetest.log("action", "User "..user.nick
 					.." from IRC logs in as "..playerName)
 			irc_users[user.nick] = playerName
-			handler.record_login(playerName)
 			return true, "You are now logged in as "..playerName
 		else
 			minetest.log("action", user.nick.."@IRC attempted to log in as "
@@ -137,4 +135,3 @@ irc:register_bot_command("say", {
 		return true, "Message sent successfuly."
 	end
 })
-
